@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link href="{% static 'global/plugins/fullcalendar/fullcalendar.min.css' %}" rel="stylesheet" type="text/css" />
+
+<style type="text/css">
+	.label-green{
+		background-color: #1bbc9b;
+		width: 85.17px;
+	}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="col-md-12">
+   <div class="portlet light portlet-fit calendar">
+       <div class="portlet-title">
+           <div class="caption">
+               <i class=" icon-layers font-green"></i>
+               <span class="caption-subject font-green sbold uppercase">Schedule</span>
+               <button class="btn green" onclick="save_events()">Save Changes</button>
+           </div>
+       </div>
+       <div class="portlet-body">
+           <div class="row">
+               <div class="col-md-2 col-sm-12">
+                   <!-- BEGIN DRAGGABLE EVENTS PORTLET-->
+                   <h3 class="event-form-title margin-bottom-20">Events</h3>
+                   <div id="external-events">
+                       <hr/>
+                       <div id="event_box" class="margin-bottom-10"></div>
+                       
+                       <hr class="visible-xs" /> </div>
+                   <!-- END DRAGGABLE EVENTS PORTLET-->
+               </div>
+               <div class="col-md-10 col-sm-12">
+                   <div id="calendar" class="has-toolbar"> </div>
+               </div>
+           </div>
+       </div>
+   </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+
+<script src="{% static 'global/plugins/moment.min.js' %}" type="text/javascript"></script>
+<script src="{% static 'global/plugins/fullcalendar/fullcalendar.min.js' %}" type="text/javascript"></script>
+<script src="{% static 'global/plugins/jquery-ui/jquery-ui.min.js' %}" type="text/javascript"></script>
+
+<script src="{% static 'apps/scripts/calendar.js' %}" type="text/javascript"></script>
+
+<script type="text/javascript">
+	jQuery(document).ready(function() {    
+	   AppCalendar.init(); 
+	});
+
+	function save_events(){
+		var current_date = moment()
+
+		var events = $("#calendar").fullCalendar('clientEvents');
+		var submit_data = []
+		for(var i=0; i<events.length; i++){
+			if(events[i].end == null)
+				events[i].end = events[i].start
+
+			if(current_date > events[i].end)
+				continue;
+
+			var item = {"title": events[i].title, "start_date": events[i].start.format("YYYY-MM-DD 00:00"), "end_date": events[i].end.format("YYYY-MM-DD 23:59")}
+
+			submit_data.push(item)
+		}
+
+		console.log(submit_data)
+
+		$.ajax({
+	        type: "POST",
+	        url:  '{% url "update_calendar" %}',
+	        data: {"data": JSON.stringify(submit_data)},
+	        dataType: "json",
+	        success: function (response) {
+	        	$('#calendar').fullCalendar( 'removeEvents')
+	        	$('#calendar').fullCalendar('refetchEvents');
+	        },
+	        error: function (x, e) {
+	        }
+	    })	   
+	}
+</script>
+{% endblock %}

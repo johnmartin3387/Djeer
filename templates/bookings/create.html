@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<style type="text/css">
+    .control-label{
+        text-align: left !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- BEGIN PORTLET-->
+<div class="row">
+<div class="col-md-12 ">
+    <!-- BEGIN SAMPLE FORM PORTLET-->
+    <div class="portlet light ">
+        <div class="portlet-title">
+            <div class="caption">
+                <i class="icon-settings font-dark"></i>
+                <span class="caption-subject font-dark sbold">Send an Offer</span>
+            </div>
+            
+        </div>
+        <div class="portlet-body form">
+            {% if error = True %}
+                <div class="bold font-red"> You already had a contract for this event</div>
+            {% else %}
+            <form name="proposal" method="post" id="booking_form" role="form" class="form-horizontal">
+                <div class="form-body">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label class="control-label col-md-8">
+                        <b>Hourly Rate</b><br/>
+                        This is the hourly amount the event host will see on your proposal
+                        </label>
+                        <div class="col-md-3">
+                            <select name="price" class="form-control" onchange="change_price(this)">
+                                {% for rt in price %}
+                                <option value="{{ rt }}" {% if rt == rate %} selected {% endif %}>$ {{ rt }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-md-8">
+                        <b>Time</b><br/>
+                        {{ bid.event.date|date:"l - M d, Y" }} {{ bid.event.start_time|date:"P" }} ~ {{ bid.event.end_time|date:"P" }}
+                        </label>
+                        <div class="col-md-3">
+                            <label class="form-control" style="border: 0px;"><span class="interval">{{time_interval}}</span> hours</label>
+                            <input type="hidden" name="hours" value="{{time_interval}}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-md-8">
+                        <b>Total Price</b><br/>
+                        This is the total amount the event host will see on your proposal
+                        </label>
+                        <div class="col-md-3">
+                             <label class="form-control" style="border: 0px;">$ <span class="total">{{total}}</span></label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-md-8 bold">10% Djeer Service Fee
+                        </label>
+                        <div class="col-md-3">
+                            <label class="form-control" style="border: 0px;">$ <span class="fee">{{fee}}</span></label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-md-8">
+                        <b>You'll Receive</b><br/>
+                        The estimated amount you'll receive after service fees
+                        </label>
+                        <div class="col-md-3">
+                            <label class="form-control" style="border: 0px;">$ <span class="benefit bold">{{benefit}}</span></label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-12"><b>Description</b>
+                        </label>
+                        <div class="col-md-12">
+                            <textarea class="form-control" name="description" rows="10"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <div class="row">
+                        <div class="col-md-offset-3 col-md-9">
+                            <button type="submit" class="btn green">Send</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            {%endif%}
+        </div>
+    </div>
+    
+</div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+
+<script src="{% static 'global/plugins/jquery-validation/js/jquery.validate.min.js' %}" type="text/javascript"></script>
+<script src="{% static 'global/plugins/jquery-ui/jquery-ui.min.js' %}" type="text/javascript"></script>
+
+<script type="text/javascript">
+
+$(document).ready(function(){
+    var form = $('#booking_form');
+    form.validate({
+        doNotHideMessage: true, //this option enables to show the error/success messages on tab switch.
+        errorElement: 'span', //default input error message container
+        errorClass: 'help-block help-block-error', // default input error message class
+        focusInvalid: false, // do not focus the last invalid input
+        rules: {
+            //account
+            price: {
+                maxlength: 4,
+                required: true,
+                digits: true
+            },
+            description: {
+                required: true
+            }
+        },
+        highlight: function (element) { // hightlight error inputs
+            $(element)
+                .closest('.form-group').removeClass('has-success').addClass('has-error'); // set error class to the control group
+        },
+
+        unhighlight: function (element) { // revert the change done by hightlight
+            $(element)
+                .closest('.form-group').removeClass('has-error'); // set error class to the control group
+        },
+    });
+})
+
+function change_price(obj){
+    rate = parseInt($(obj).val())
+    if(rate == NaN){
+        $(obj).val("")
+        return;
+    }
+    total = rate * parseInt($(".interval").html())
+    $(".total").html(total)
+    $(".fee").html(total * 0.1)
+    $(".benefit").html(total - total * 0.1)
+}
+</script>
+{% endblock %}

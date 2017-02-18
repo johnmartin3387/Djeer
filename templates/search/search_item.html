@@ -1,0 +1,113 @@
+{% load static %}
+
+{% if loadmore == False %}
+<div class="portfolio-content portfolio-3">
+	<div id="js-grid-lightbox-gallery" class="cbp">
+		{% for dj in items %}
+		<div class="cbp-item web-design graphic print motion">
+			<a href="{% url 'search_detail' %}?id={{ dj.id }}&event_id={{event_id}}" class="cbp-caption" data-title="{{dj.title}}" rel="nofollow">
+				<div class="cbp-caption-defaultWrap">
+					<div class="cbp-l-caption-body" style="position: absolute; padding: 12px 30px;">
+							<div class="cbp-l-caption-title" style="color: black;">{{dj.title}}</div>
+							<div class="cbp-l-caption-desc">$ {{dj.rate}}</div>
+						</div>
+					<img src="{% static 'images/' %}{{dj.person.image}}" style="height: 250px;" alt=""> 
+					
+				</div>
+				<div class="cbp-caption-activeWrap">
+					<div class="cbp-l-caption-alignLeft">
+						<div class="cbp-l-caption-body">
+							<div class="cbp-l-caption-title">{{dj.title}}</div>
+							<div class="cbp-l-caption-desc">$ {{dj.rate}}</div>
+						</div>
+					</div>
+				</div>
+			</a>
+		</div>
+		{% endfor %}	
+	</div>
+	<div id="js-loadMore-lightbox-gallery" class="cbp-l-loadMore-button">
+		<a href="{%url 'loadmore' %}?page={{ page }}&{{param}}&event_id={{event_id}}" class="cbp-l-loadMore-link btn grey-mint btn-outline" rel="nofollow">
+			<span class="cbp-l-loadMore-defaultText">LOAD MORE</span>
+			<span class="cbp-l-loadMore-loadingText">LOADING...</span>
+			<span class="cbp-l-loadMore-noMoreLoading">NO MORE DJs</span>
+		</a>
+	</div>
+</div>
+
+<script type="text/javascript">
+	$(document).ready(function(){
+
+		{% if items|length == 0 %}
+			map = MapsGoogle.init(40.7250632, -73.9976946);
+		{% else %}
+			map = MapsGoogle.init(parseFloat('{{ items.0.person.address.lat }}'), parseFloat('{{ items.0.person.address.lng }}'));
+
+			{% for dj in items %}
+			var marker = map.addMarker({
+	            lat: parseFloat('{{ dj.person.address.lat }}'),
+	            lng: parseFloat('{{ dj.person.address.lng }}'),
+	            title: '$ {{dj.rate}}',
+	            infoWindow: {
+	                content: '<span style="color:red">$ {{dj.rate}}</span>'
+	            }
+	        });
+	        marker.infoWindow.open(map, marker);
+	        {% endfor %}
+
+        {% endif %}
+
+        $(".cbp-l-loadMore-defaultText").click(function(){
+        	
+	    	var url = "{%url 'loadmore_json' %}?page=" + page.toString() + "&{{param}}"
+
+	    	$.ajax({
+                url: url,
+                type: 'GET',
+                dataType: 'json',
+                timeout: 10000
+            })
+            .done(function(result) {
+            	for(var i=0; i<result.data.length; i++){
+					var marker = map.addMarker({
+			            lat: parseFloat(result.data[i]["lat"]),
+			            lng: parseFloat(result.data[i]["lng"]),
+			            title: '$ ' + result.data[i]["rate"],
+			            infoWindow: {
+			                content: '<span style="color:red">$ '+ result.data[i]["rate"] +'</span>'
+			            }
+			        });
+			        marker.infoWindow.open(map, marker);
+				}
+				page = parseInt(result.page)
+				$(".cbp-l-loadMore-link").attr("href", "{%url 'loadmore' %}?page=" + page.toString() + "&{{param}}&event_id={{event_id}}")
+            })
+	    })
+	})
+</script>
+{% else %}
+<div class="portfolio-content">
+    <div class="cbp-loadMore-block{{page|add:-1}}">
+    	{% for dj in items %}
+        <div class="cbp-item web-design print motion">
+            <a href="{% url 'search_detail' %}?id={{ dj.id }}&event_id={{event_id}}" class="cbp-caption" data-title="{{dj.title}}" rel="nofollow">
+                <div class="cbp-caption-defaultWrap">
+                	
+                    <img src="{% static 'images/' %}{{dj.person.image}}" style="height: 250px;" alt=""> </div>
+                <div class="cbp-caption-activeWrap">
+                    <div class="cbp-l-caption-alignLeft">
+                        <div class="cbp-l-caption-body">
+                            <div class="cbp-l-caption-title">{{dj.title}}</div>
+                            <div class="cbp-l-caption-desc">$ {{dj.rate}}</div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="cbp-loadMore-block{{page}}">
+    </div>
+</div>
+
+{% endif %}

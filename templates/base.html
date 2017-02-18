@@ -1,0 +1,669 @@
+{% load staticfiles %}
+{% load firstof from future %}
+
+<!DOCTYPE html>
+
+<!--[if !IE]><!-->
+
+<html lang="en">
+
+    <!--<![endif]-->
+
+    <!-- BEGIN HEAD -->
+
+
+
+    <head>
+
+        <meta charset="utf-8" />
+
+        <title>Djeer</title>
+
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+        <meta content="width=device-width, initial-scale=1" name="viewport" />
+
+        <meta content="" name="author" />
+
+        <!-- BEGIN GLOBAL MANDATORY STYLES -->
+
+        <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700&subset=all" rel="stylesheet" type="text/css" />
+
+        <link href="{% static 'global/plugins/font-awesome/css/font-awesome.min.css' %}" rel="stylesheet" type="text/css" />
+
+        <link href="{% static 'global/plugins/simple-line-icons/simple-line-icons.min.css' %}" rel="stylesheet" type="text/css" />
+
+        <link href="{% static 'global/plugins/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet" type="text/css" />
+
+        <link href="{% static 'global/plugins/bootstrap-switch/css/bootstrap-switch.min.css' %}" rel="stylesheet" type="text/css" />
+
+        <!-- END GLOBAL MANDATORY STYLES -->
+
+        <!-- BEGIN THEME GLOBAL STYLES -->
+
+        <link href="{% static 'global/css/components.min.css' %}" rel="stylesheet" id="style_components" type="text/css" />
+
+        <link href="{% static 'global/css/plugins.min.css' %}" rel="stylesheet" type="text/css" />
+
+        <!-- END THEME GLOBAL STYLES -->
+
+        <!-- BEGIN THEME LAYOUT STYLES -->
+
+        <link href="{% static 'layouts/layout3/css/layout.min.css' %}" rel="stylesheet" type="text/css" />
+
+        <link href="{% static 'layouts/layout3/css/themes/default.min.css' %}" rel="stylesheet" type="text/css" id="style_color" />
+
+        <link href="{% static 'layouts/layout3/css/custom.min.css' %}" rel="stylesheet" type="text/css" />
+
+        <!-- END THEME LAYOUT STYLES -->
+
+        {% block extra_css %}{% endblock %}
+
+        <link rel="shortcut icon" href="favicon.ico" /> </head>
+
+    <!-- END HEAD -->
+
+
+
+    <body class="page-container-bg-solid page-md">
+
+        <div class="page-wrapper">
+
+            <div class="page-wrapper-row">
+
+                <div class="page-wrapper-top">
+
+                    <!-- BEGIN HEADER -->
+
+                    <div class="page-header" style="margin: 0px;">
+
+                        <!-- BEGIN HEADER TOP -->
+
+                        <div class="page-header-top">
+
+                            <div class="container">
+
+                                <!-- BEGIN LOGO -->
+
+                                <div class="page-logo">
+
+                                    <a href="{% url 'main' %}">
+
+                                        <img src="{% static 'images/djeer_logo.png' %}" alt="logo" class="logo-default" style="width:106px; height: 37px; margin: 18px 0px 0px 0px;">
+
+                                    </a>
+
+                                </div>
+
+                                <!-- END LOGO -->
+
+                                <!-- BEGIN RESPONSIVE MENU TOGGLER -->
+                                <a href="javascript:;" class="menu-toggler"></a>
+                                <!-- END RESPONSIVE MENU TOGGLER -->
+
+                                <!-- BEGIN TOP NAVIGATION MENU -->
+
+                                <div class="top-menu">
+
+                                    <ul class="nav navbar-nav pull-right">
+
+                                        <!-- BEGIN NOTIFICATION DROPDOWN -->
+
+                                        <!-- DOC: Apply "dropdown-hoverable" class after "dropdown" and remove data-toggle="dropdown" data-hover="dropdown" data-close-others="true" attributes to enable hover dropdown mode -->
+
+                                        <!-- DOC: Remove "dropdown-hoverable" and add data-toggle="dropdown" data-hover="dropdown" data-close-others="true" attributes to the below A element with dropdown-toggle class -->
+
+                                        <li class="dropdown dropdown-extended dropdown-notification dropdown-dark" id="header_notification_bar">
+
+                                            <a href="javascript:;" class="dropdown-toggle reset-notification" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
+
+                                                <i class="icon-bell"></i>
+
+                                                <span class="badge badge-default notification-count" style="display: None">0</span>
+
+                                            </a>
+
+                                            <ul class="dropdown-menu">
+
+                                                <li>
+
+                                                    <ul class="dropdown-menu-list scroller notification-content" style="height: 250px;" data-handle-color="#637283">
+
+                                                        <li>
+
+                                                            <a href="javascript:;">
+
+                                                                <span class="details">
+                                                                     No Notification </span>
+
+                                                            </a>
+
+                                                        </li>
+														
+                                                    </ul>
+
+                                                </li>
+
+                                            </ul>
+
+                                        </li>
+
+                                        <!-- END NOTIFICATION DROPDOWN -->
+
+                                        <!-- BEGIN TODO DROPDOWN -->
+
+                                        <li class="dropdown dropdown-extended dropdown-tasks dropdown-dark" id="header_task_bar">
+
+                                            <a href="{% url 'message' %}" class="dropdown-toggle">
+
+                                                <i class="icon-envelope"></i>
+
+                                                <span class="badge badge-default unread-message" style="display: none;"></span>
+
+                                            </a>
+
+                                            <ul class="dropdown-menu extended tasks">
+
+                                            </ul>
+
+                                        </li>
+
+                                        <!-- END TODO DROPDOWN -->
+
+                                        <li class="droddown dropdown-separator">
+
+                                            <span class="separator"></span>
+
+                                        </li>
+
+                                        <!-- BEGIN USER LOGIN DROPDOWN -->
+
+                                        <li class="dropdown dropdown-user dropdown-dark">
+
+                                            <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
+                                                <img alt="" class="img-circle" src="/static/images/{{request.session.user.image}}">
+
+                                                <span class="username username-hide-mobile">{{request.session.user.name}}</span>
+
+                                            </a>
+
+                                            <ul class="dropdown-menu dropdown-menu-default">
+
+                                                <li>
+
+                                                    <a href="{% url 'profile' %}">
+
+                                                        <i class="icon-user"></i> My Profile </a>
+
+                                                </li>
+                                                {% if request.session.user.role == "dj" %}
+                                                <li>
+
+                                                    <a href="app_calendar.html">
+
+                                                        <i class="icon-calendar"></i> My Calendar </a>
+
+                                                </li>
+                                                {% endif %}
+
+                                                
+                                                <li class="divider"> </li>
+                                                <!--<li>
+
+                                                    <a href="app_todo_2.html">
+
+                                                        <i class="icon-rocket"></i> My Tasks
+
+                                                        <span class="badge badge-success"> 7 </span>
+
+                                                    </a>
+
+                                                </li>
+
+                                                <li class="divider"> </li>
+
+                                                <li>
+
+                                                    <a href="page_user_lock_1.html">
+
+                                                        <i class="icon-lock"></i> Lock Screen </a>
+
+                                                </li>-->
+
+                                                <li>
+
+                                                    <a href="{% url 'logout' %}">
+
+                                                        <i class="icon-key"></i> Log Out </a>
+
+                                                </li>
+
+                                            </ul>
+
+                                        </li>
+
+                                        <!-- END USER LOGIN DROPDOWN -->
+
+                                        <!-- BEGIN QUICK SIDEBAR TOGGLER -->
+
+                                        <li class="dropdown dropdown-extended quick-sidebar-toggler">
+
+                                            <span class="sr-only">Toggle Quick Sidebar</span>
+
+                                            <i class="icon-logout" onclick="{% if request.session.user.role == 'host' %} window.location.href='/' {% endif %}"></i>
+
+                                        </li>
+
+                                        <!-- END QUICK SIDEBAR TOGGLER -->
+
+                                    </ul>
+
+                                </div>
+
+                                <!-- END TOP NAVIGATION MENU -->
+
+                            </div>
+
+                        </div>
+
+                        <!-- END HEADER TOP -->
+
+                        <!-- BEGIN HEADER MENU -->
+
+                        <div class="page-header-menu">
+
+                            <div class="container">
+                              <div class="hor-menu  ">
+                                  <ul class="nav navbar-nav">
+                                      
+                                      <li aria-haspopup="true" class="{% if menu == 'dashboard' %} active {% endif %}">
+                                          <a href="{% url 'dashboard' %}"> Find {% if request.session.user.role == "host" %}DJs{% else %}Events{% endif %}
+                                              <span class="arrow"></span>
+                                          </a>
+                                      </li>
+                                      <li aria-haspopup="true" class="{% if menu == 'inbox' %} active {% endif %}">
+                                          <a href="{% url 'message' %}"> Inbox
+                                              <span class="badge unread-message" style="background-color: #ed6b75; display: none;"></span>
+                                              <span class="arrow"></span>
+                                          </a>
+                                      </li>
+                                      {% if request.session.user.role == "host" %}
+                                      <li aria-haspopup="true" class="{% if menu == 'events' %} active {% endif %}">
+                                          <a href="{% url 'event_list' %}"> Your Events
+                                              <span class="arrow"></span>
+                                          </a>
+                                      </li>
+                                      {% else %}
+                                      <li aria-haspopup="true" class="{% if menu == 'bookings' %} active {% endif %}">
+                                          <a href="{% url 'booking_list' %}"> Your Bookings
+                                              <span class="arrow"></span>
+                                          </a>
+                                      </li>
+                                      {% endif %}
+                                      <li aria-haspopup="true" class="{% if menu == 'profile' %} active {% endif %}">
+                                          <a href="{% url 'profile' %}"> Profile
+                                              <span class="arrow"></span>
+                                          </a>
+                                      </li>
+
+                                      {% if request.session.user.role == "dj" %}
+                                      <li aria-haspopup="true" class="{% if menu == 'calendar' %} active {% endif %}">
+                                          <a href="{% url 'calendar' %}"> My Calendar
+                                              <span class="arrow"></span>
+                                          </a>
+                                      </li>
+                                      {% endif %}
+                                  </ul>
+                               </div>
+							                     </div>
+
+                        </div>
+
+                        <!-- END HEADER MENU -->
+
+                    </div>
+
+                    <!-- END HEADER -->
+
+                </div>
+
+            </div>
+
+            <div class="page-wrapper-row full-height">
+
+                <div class="page-wrapper-middle">
+
+                    <!-- BEGIN CONTAINER -->
+
+                    <div class="page-container">
+
+                        <!-- BEGIN CONTENT -->
+
+                        <div class="page-content-wrapper">
+                            <div class="page-content">
+                            <div class="container">
+                            {% block content %}{% endblock %}
+                            </div>
+                            </div>
+                        </div>
+
+                        <!-- END CONTENT -->
+
+                    </div>
+
+                    <!-- END CONTAINER -->
+
+                </div>
+
+            </div>
+
+            <div class="page-wrapper-row">
+
+                <div class="page-wrapper-bottom">
+
+                    <!-- BEGIN FOOTER -->
+
+                    <!-- BEGIN PRE-FOOTER -->
+
+                    <div class="page-prefooter">
+
+                        <div class="container">
+
+                            <div class="row">
+
+                                <div class="col-md-3 col-sm-6 col-xs-12 footer-block">
+
+                                    <div><button class="btn default" style="width: 150px; margin: 20px;"> Country </button></div>
+                                    <div><button class="btn default" style="width: 150px; margin: 5px 20px;"> Language </button></div>
+
+                                </div>
+
+                                <div class="col-md-2 col-sm-6 col-xs-12 footer-block">
+
+                                    <h2 style="color: white">Company</h2>
+
+                                    <a href="javascript:;">About</a><br/>
+                                    <a href="javascript:;">Press</a><br/>
+                                    <a href="javascript:;">Blog</a><br/>
+                                    <a href="{% url 'help_live' %}">Help</a><br/>
+                                    <a href="{% url 'help_live' %}?key=Terms%20%26%20Policies">Policies</a><br/>
+
+                                </div>
+
+                                <div class="col-md-2 col-sm-6 col-xs-12 footer-block">
+
+                                    <h2 style="color: white">Find</h2>
+
+                                    <a href="{% url 'help_live' %}?key=Trust%20%26%20Safety">Trust & Safety</a><br/>
+                                    <a href="javascript:;">Invite Friends</a><br/>
+                                    <a href="javascript:;">Mobile</a><br/>
+                                    <a href="javascript:;">Site Map</a><br/>
+
+                                </div>
+
+                                <div class="col-md-2 col-sm-6 col-xs-12 footer-block">
+
+                                    <h2 style="color: white">DJ'ing</h2>
+
+                                    <a href="{% url 'help_live' %}?key=How%20it%20works">Why DJ</a><br/>
+                                    <a href="javascript:;">Insurance</a><br/>
+                                    <a href="javascript:;">Safety</a><br/>
+
+                                </div>
+
+                                <div class="col-md-3 col-sm-6 col-xs-12 footer-block">
+
+                                    <h2 style="color: white">Follow Us On</h2>
+
+                                    <ul class="social-icons">
+
+                                        <li>
+
+                                            <a href="javascript:;" data-original-title="rss" class="rss"></a>
+
+                                        </li>
+
+                                        <li>
+
+                                            <a href="javascript:;" data-original-title="facebook" class="facebook"></a>
+
+                                        </li>
+
+                                        <li>
+
+                                            <a href="javascript:;" data-original-title="twitter" class="twitter"></a>
+
+                                        </li>
+
+                                        <li>
+
+                                            <a href="javascript:;" data-original-title="googleplus" class="googleplus"></a>
+
+                                        </li>
+
+                                        <li>
+
+                                            <a href="javascript:;" data-original-title="linkedin" class="linkedin"></a>
+
+                                        </li>
+
+                                        <li>
+
+                                            <a href="javascript:;" data-original-title="youtube" class="youtube"></a>
+
+                                        </li>
+
+                                        <li>
+
+                                            <a href="javascript:;" data-original-title="vimeo" class="vimeo"></a>
+
+                                        </li>
+
+                                    </ul>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- END PRE-FOOTER -->
+
+                    <!-- BEGIN INNER FOOTER -->
+
+                    <div class="page-footer">
+
+                        <div class="container"> 2016 &copy; Djeer
+
+                            <!--<a target="_blank" href="http://keenthemes.com">Keenthemes</a> &nbsp;|&nbsp;
+
+                            <a href="http://themeforest.net/item/metronic-responsive-admin-dashboard-template/4021469?ref=keenthemes" title="Purchase Metronic just for 27$ and get lifetime updates for free" target="_blank">Purchase Metronic!</a>
+							-->
+                        </div>
+
+                    </div>
+
+                    <div class="scroll-to-top">
+
+                        <i class="icon-arrow-up"></i>
+
+                    </div>
+
+                    <!-- END INNER FOOTER -->
+
+                    <!-- END FOOTER -->
+
+                </div>
+
+            </div>
+
+        </div>
+
+        
+
+        <!-- BEGIN CORE PLUGINS -->
+
+        <script src="{% static 'global/plugins/jquery.min.js' %}" type="text/javascript"></script>
+
+        <script src="{% static 'global/plugins/bootstrap/js/bootstrap.min.js' %}" type="text/javascript"></script>
+
+        <script src="{% static 'global/plugins/js.cookie.min.js' %}" type="text/javascript"></script>
+
+        <script src="{% static 'global/plugins/jquery-slimscroll/jquery.slimscroll.min.js' %}" type="text/javascript"></script>
+
+        <script src="{% static 'global/plugins/jquery.blockui.min.js' %}" type="text/javascript"></script>
+
+        <script src="{% static 'global/plugins/bootstrap-switch/js/bootstrap-switch.min.js' %}" type="text/javascript"></script>
+
+
+
+        <!-- END CORE PLUGINS -->
+
+        <!-- BEGIN THEME GLOBAL SCRIPTS -->
+
+        <script src="{% static 'global/scripts/app.min.js' %}" type="text/javascript"></script>
+
+        <!-- END THEME GLOBAL SCRIPTS -->
+
+        <!-- BEGIN THEME LAYOUT SCRIPTS -->
+
+        <script src="{% static 'layouts/layout3/scripts/layout.min.js' %}" type="text/javascript"></script>
+
+        <script src="{% static 'layouts/layout3/scripts/demo.min.js' %}" type="text/javascript"></script>
+
+
+        <script src="{% static 'chat/quickblox.min.js' %}"></script>
+        <script src="{% static 'chat/libs/stickerpipe/js/stickerpipe.js' %}"></script>
+        <script src="{% static 'chat/js/config.js' %}"></script>
+        <script src="{% static 'chat/js/connection.js' %}"></script>
+        <script src="{% static 'chat/js/messages.js' %}"></script>
+        <script src="{% static 'chat/js/stickerpipe.js' %}"></script>
+        <script src="{% static 'chat/js/ui_helpers.js' %}"></script>
+        <script src="{% static 'chat/js/dialogs.js' %}"></script>
+        <script src="{% static 'chat/js/users.js' %}"></script>
+
+        <!-- END THEME LAYOUT SCRIPTS -->
+
+        <script>
+            $("document").ready(function(){
+                {% if message != '1' %}
+                    updateUnreadMessageCount()
+                {% endif %}
+                updateNotification()
+                setInterval(function(){ 
+                    {% if message != '1' %}
+                        // updateUnreadMessageCount()
+                    {% endif %}
+                    updateNotification()
+                }, 120000);
+
+                $(".reset-notification").click(function(){
+                    if(parseInt($(".notification-count").html()) > 0)
+                        resetNotification()
+                })
+            })
+
+            function updateNotification(){
+                $.ajax({
+                    url: '{% url "notification" %}',
+                    type: 'GET',
+                    dataType: 'json',
+                    timeout: 10000
+                })
+                .done(function(result) {
+                    $(".notification-count").html(result.count)
+                    if(result.count != 0){
+                        $(".notification-count").show()
+                        var content = ""
+                        for(var i=0; i<result.content.length; i++){
+                            var url = "javascript:;"
+                            if(result.content[i].url != "")
+                                url = result.content[i].url
+
+                            content += '<li> \
+                                            <a href="'+url+'"> \
+                                                <span class="details">\
+                                                     ' + result.content[i].message + ' </span>\
+                                            </a> \
+                                        </li>'
+                        }
+
+                        $(".notification-content").html(content)
+                    }else{
+                        $(".notification-count").hide()
+                        $(".notification-content").html("")
+                    }
+                })
+            }
+
+            function resetNotification(){
+                $.ajax({
+                    url: '{% url "reset-notification" %}',
+                    type: 'GET',
+                    dataType: 'json',
+                    timeout: 10000
+                })
+                .done(function(result) {
+                    $(".notification-count").html(result.count)
+                    if(result.count != 0){
+                        $(".notification-count").show()
+                    }else{
+                        $(".notification-count").hide()
+                    }
+                })
+            }
+
+            function updateUnreadMessageCount(){
+                var user = {
+                    id: null,
+                    name: '{{request.session.user.name}}',
+                    login: '',
+                    email: '{{request.session.user.email}}',
+                    password: '{{request.session.user.password}}' + pass_suffix
+                };
+
+                QB.init(QBApp.appId, QBApp.authKey, QBApp.authSecret, config);
+                QB.createSession({email: user.email, password: user.password}, function(err, res) {
+                    if (res) {
+                        token = res.token;
+                        user.id = res.user_id;
+
+                        QB.chat.connect({userId: user.id, password: user.password}, function(err, roster) {
+                            if (err) {
+                              console.error(err);
+                            } else {
+                                QB.chat.dialog.list(null, function(err, resDialogs) {
+                                    if (err) {
+                                      console.error(err);
+                                    } else {
+                                        var unreadMessage = 0
+                                        resDialogs.items.forEach(function(item, i, arr) {
+                                            unreadMessage += item.unread_messages_count
+                                        });
+
+                                        if(unreadMessage == 0){
+                                            $(".unread-message").hide()
+                                            $(".notification-content").html("")
+                                        }else{
+                                            $(".unread-message").show()
+                                            $(".unread-message").html(unreadMessage)
+                                        }
+                                    }
+                                })
+                            }
+                        })
+                    }
+                })
+            }
+        </script>
+
+        {% block extra_js %}{% endblock %}
+
+
+    </body>
+
+
+
+</html>

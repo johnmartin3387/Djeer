@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link href="{% static 'global/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.min.css' %}" rel="stylesheet" type="text/css" />
+<link href="{% static 'global/plugins/clockface/css/clockface.css' %}" rel="stylesheet" type="text/css" />
+
+<link href="{% static 'global/plugins/select2/css/select2.min.css' %}" rel="stylesheet" type="text/css" />
+<link href="{% static 'global/plugins/select2/css/select2-bootstrap.min.css' %}" rel="stylesheet" type="text/css" />
+<link href="{% static 'layouts/layout3/css/custom.min.css' %}" rel="stylesheet" type="text/css" />
+
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <!-- BEGIN PORTLET-->
+        <div class="portlet light form-fit ">
+            <div class="portlet-title">
+                <div class="caption">
+                    <i class="icon-pin font-blue"></i>
+                    <span class="caption-subject font-blue sbold uppercase">Event</span>
+                </div>
+                
+            </div>
+            <div class="portlet-body form">
+                <!-- BEGIN FORM-->
+                <form id="event_form" name="create_event_form" class="form-horizontal form-bordered0" method="post">
+                {% csrf_token %}
+                    <input type="hidden" name="lat" class="lat">
+                    <input type="hidden" name="lng" class="lng">
+                    <div class="form-body">
+                        <div class="alert alert-danger display-none">
+                            <button class="close" data-dismiss="alert"></button> The start time must be greater than the end time. </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3">Title
+                                <span class="required"> * </span>
+                            </label>
+                            <div class="col-md-3">
+                                <input type="text" class="form-control" name="title"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3">Description
+                                <span class="required"> * </span>
+                            </label>
+                            <div class="col-md-5">
+                                <textarea class="form-control" name="description" rows="5"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="multiple" class="control-label col-md-3">Event Type
+                                <span class="required"> * </span>
+                            </label>
+                            <div class="col-md-4">
+                                <select id="multiple" class="form-control select2-multiple-type" multiple name="event_type">
+                                    {% for et in event_type %}
+                                    <option value="{{ et }}">{{ et }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="multiple" class="control-label col-md-3">Genre
+                                <span class="required"> * </span>
+                            </label>
+                            <div class="col-md-4">
+                                <select class="form-control select2-multiple-genre" multiple name="genre">
+                                    {% for gn in genre %}
+                                    <option value="{{ gn }}">{{ gn }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3">Price
+                                <span class="required"> * </span>
+                            </label>
+                            <div class="col-md-3">
+                                <select name="price" class="form-control">
+                                    {% for rt in rate %}
+                                    <option value="{{ rt }}">$ {{ rt }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <!-- <div class="form-group">
+                            <label class="control-label col-md-3">Event Type
+                            </label>
+                            <div class="col-md-4">
+                                <select class="form-control" name="event_type">
+                                    {% for tp in types %}
+                                    <option value="{{ tp }}">{{ tp }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>-->
+                        <div class="form-group">
+                            <label class="control-label col-md-3">Date
+                            <span class="required"> * </span></label>
+                            <div class="col-md-3">
+                                <div class="input-group">
+                                    <input name="date" class="form-control form-control-inline input-medium date-picker" size="16" type="text" value="" />
+                                    <span class="input-group-btn">
+                                        <button class="btn default date-range-toggle" type="button">
+                                            <i class="fa fa-calendar"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3">Start
+                            <span class="required"> * </span></label>
+                            <div class="col-md-3">
+                                <div class="input-group">
+                                    <input type="text" name="start_time" data-format="HH" class="form-control clockface_1 start_time" />
+                                    <span class="input-group-btn">
+                                        <button class="btn default" type="button">
+                                            <i class="fa fa-clock-o"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3">End
+                            <span class="required"> * </span></label>
+                            <div class="col-md-3">
+                                <div class="input-group">
+                                    <input type="text" name="end_time" data-format="HH" class="form-control clockface_1 end_time" />
+                                    <span class="input-group-btn">
+                                        <button class="btn default" type="button">
+                                            <i class="fa fa-clock-o"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3">Street
+                                <span class="required"> * </span>
+                            </label>
+                            <div class="col-md-4">
+                                <input type="text" class="form-control" name="address"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3">City/Town
+                                <span class="required"> * </span>
+                            </label>
+                            <div class="col-md-4">
+                                <input type="text" class="form-control" name="city"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3">State
+                                <span class="required"> * </span>
+                            </label>
+                            <div class="col-md-4">
+                                <input type="text" class="form-control" name="state"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3">Country</label>
+                            <div class="col-md-4">
+                                <select name="country" id="country_list" class="form-control">
+                                    <option value=""></option>
+                                    {% for ctry in country_name %}
+                                    <option value="{{ ctry }}">{{ ctry }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group last">
+                            <label class="control-label col-md-3">Zip Code
+                                <span class="required"> * </span>
+                            </label>
+                            <div class="col-md-4">
+                                <input type="text" class="form-control zipcode" name="zipcode" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <div class="row">
+                            <div class="col-md-offset-3 col-md-9">
+                                <button type="button" class="btn grey-salsa btn-outline create-event">
+                                    <i class="fa fa-check"></i> Submit</button>
+                                <button type="button" class="btn green">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                
+                <!-- END FORM-->
+            </div>
+        </div>
+        <!-- END PORTLET-->
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="http://maps.google.com/maps/api/js?key=AIzaSyBnHlSEclSTBn7a71JBqWaB9PffTlCmsT0" type="text/javascript"></script>
+<script src="{% static 'global/plugins/moment.min.js' %}" type="text/javascript"></script>
+<script src="{% static 'global/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js' %}" type="text/javascript"></script>
+<script src="{% static 'global/plugins/clockface/js/clockface.js' %}" type="text/javascript"></script>
+<script src="{% static 'pages/scripts/components-date-time-pickers.js' %}" type="text/javascript"></script>
+<script src="{% static 'global/plugins/select2/js/select2.full.min.js' %}" type="text/javascript"></script>
+<script src="{% static 'global/plugins/jquery-validation/js/jquery.validate.min.js' %}" type="text/javascript"></script>
+<script src="{% static 'global/plugins/gmaps/gmaps.min.js' %}" type="text/javascript"></script>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        $(".select2-multiple-genre").select2({
+            placeholder: "Select a Genre",
+            width: null
+        });
+        $(".select2-multiple-type").select2({
+            placeholder: "Select a Event Type",
+            width: null
+        });
+    })
+</script>
+{% endblock %}
